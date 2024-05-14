@@ -29,8 +29,19 @@ async def on_message(message):
        message.author.id == XM_BOT_ID:
         return
     
-    # echo others' messages
-    await message.channel.send(message.content)
+    # for file attachments
+    if message.attachments:
+        for attachment in message.attachments:
+            try:
+                await attachment.save(attachment.filename)
+                file = discord.File(attachment.filename)
+                await message.channel.send(message.content, file=file)
+                os.remove(attachment.filename)
+            except discord.errors.HTTPException:
+                await print("Failed to send attachment")
+    else: 
+        # echo others' messages
+        await message.channel.send(message.content)
 
 # start the bot
 client.run(BOT_TOKEN)
