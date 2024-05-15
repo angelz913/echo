@@ -24,7 +24,7 @@ async def on_ready():
 # when the bot gets a message
 @client.event
 async def on_message(message):
-    # ignore bot's own messages or xm bot's messages
+    # ignore the bot's own messages or xm bot's messages
     if message.author == client.user or \
        message.author.id == XM_BOT_ID:
         return
@@ -42,6 +42,16 @@ async def on_message(message):
     else: 
         # echo others' messages
         await message.channel.send(message.content)
+
+# when a user reacts to a message
+@client.event
+async def on_reaction_add(reaction, user):
+    # ignore the bot's own reaction
+    if user == client.user:
+        return
+
+    # send the same reaction
+    await reaction.message.add_reaction(reaction.emoji)
 
 # start the bot
 client.run(BOT_TOKEN)
