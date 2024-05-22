@@ -38,20 +38,26 @@ async def on_message(message):
                 await message.channel.send(message.content, file=file)
                 os.remove(attachment.filename)
             except discord.errors.HTTPException:
-                await print("Failed to send attachment")
+                print("Failed to send attachment")
     else: 
         # echo others' messages
-        await message.channel.send(message.content)
+        try:
+            await message.channel.send(message.content)
+        except discord.errors.HTTPException:
+            print("Failed to send the message")
 
 # when a user reacts to a message
 @client.event
-async def on_reaction_add(reaction, user):
+async def on_raw_reaction_add(payload):
+    channel = client.get_channel(payload.channel_id)
+    message = await channel.fetch_message(payload.message_id)
+        
     # ignore the bot's own reaction
-    if user == client.user:
+    if payload.member == client.user:
         return
-
+    
     # send the same reaction
-    await reaction.message.add_reaction(reaction.emoji)
+    await message.add_reaction(payload.emoji)
 
 # start the bot
 client.run(BOT_TOKEN)
