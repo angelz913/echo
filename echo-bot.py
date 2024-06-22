@@ -14,16 +14,34 @@ intents.message_content = True
 
 # initialize
 client = discord.Client(intents=intents)
+bot_running = True
 
 # when the bot is ready
 @client.event
 async def on_ready():
     print(f'Logged in as {client.user.name}')
-    print(client.user.id)
 
 # when the bot gets a message
 @client.event
 async def on_message(message):
+    global bot_running
+    if message.content == "echo start":
+        if bot_running:
+            await message.channel.send("Echo is already running")
+        else:
+            bot_running = True
+            await message.channel.send("Echo is back")
+        return
+    
+    if message.content == "echo stop":
+        if bot_running:
+            bot_running = False
+            await message.channel.send("Echo out")
+        return
+
+    if not bot_running:
+        return
+
     # ignore the bot's own messages or xm bot's messages
     if message.author == client.user or \
        message.author.id == XM_BOT_ID:
@@ -49,6 +67,9 @@ async def on_message(message):
 # when a user reacts to a message
 @client.event
 async def on_raw_reaction_add(payload):
+    if not bot_running:
+        return
+    
     channel = client.get_channel(payload.channel_id)
     message = await channel.fetch_message(payload.message_id)
         
