@@ -14,7 +14,7 @@ intents.message_content = True
 
 # initialize
 client = discord.Client(intents=intents)
-bot_running = True
+bot_running = False
 
 # when the bot is ready
 @client.event
